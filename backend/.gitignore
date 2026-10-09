@@ -1,0 +1,16 @@
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.iml
+*.log
+
+# Build outputs
+target/
+build/
+bin/
+
+# Environment / local configs
+.env
+.env.local
