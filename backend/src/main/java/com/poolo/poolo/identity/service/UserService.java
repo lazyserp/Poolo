@@ -3,6 +3,7 @@ package com.poolo.poolo.identity.service;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
+import java.util.UUID;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -138,6 +139,23 @@ public class UserService {
                         savedUser.getRole(),
                         savedUser.getCreatedAt()
                         );
+
+    }
+
+    public UserResponseDTO getUserById(UUID id){
+        User user = userRepository.findById(id)
+                                  .orElseThrow(() -> new IllegalArgumentException("User not find"));
+        return new UserResponseDTO(
+            user.getId(),
+            user.getName(),
+            user.getCorporateEmail(),
+            user.getPhoneNumber(),
+            user.isCorporateEmailVerified(),
+            user.getRole(),
+            user.getCreatedAt()
+        );
+
+    
 
     }
 
