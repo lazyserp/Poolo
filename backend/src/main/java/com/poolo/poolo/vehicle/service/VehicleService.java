@@ -69,4 +69,10 @@ public class VehicleService {
             .map(VehicleResponseDTO::from)
             .toList();
     }
+
+    public VehicleResponseDTO getVehicleById(UUID vehicleId){
+        return  vehicleRepository.findById(vehicleId)
+                                    .map(VehicleResponseDTO::from)
+                                    .orElseThrow(() -> new IllegalArgumentException("Vehicle Not Found"));
+    }
 }
