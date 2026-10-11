@@ -4,6 +4,10 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.poolo.poolo.trip.dto.CreateTripRequest;
@@ -12,7 +16,6 @@ import com.poolo.poolo.trip.models.Trip;
 import com.poolo.poolo.trip.models.TripStatus;
 import com.poolo.poolo.trip.repository.TripRepository;
 import com.poolo.poolo.vehicle.dto.VehicleResponseDTO;
-import com.poolo.poolo.vehicle.models.Vehicle;
 import com.poolo.poolo.vehicle.service.VehicleService;
 
 import lombok.RequiredArgsConstructor;
@@ -79,5 +82,15 @@ public class TripService {
         return tripRepository.findById(id)
                              .map(TripResponseDTO::from)
                              .orElseThrow(() -> new IllegalArgumentException("No trips Found with ID: " + id));
+    }
+
+    public Slice<TripResponseDTO> searchTrips(String origin , String destination , Instant departureAfter,int minSeats,int page , int size){
+        Instant searchTime = (departureAfter != null) ? departureAfter : Instant.now();
+        int seats = (minSeats > 0) ? minSeats : 1;
+
+        Pageable pageable = PageRequest.of(page, size,Sort.by("departureTime").ascending());
+
+        return tripRepository.findByOriginIgnoreCaseAndDestinationIgnoreCaseAndStatusAndDepartureTimeAfterAndAvailableSeatsGreaterThanEqual(
+            origin, destination, TripStatus.SCHEDULED, searchTime, seats, pageable).map((trip) -> TripResponseDTO.from(trip));
     }
 }

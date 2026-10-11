@@ -1,14 +1,17 @@
 package com.poolo.poolo.trip.controller;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,6 +44,15 @@ public class TripController {
         return tripService.getTripsByHost(hostId);
     }
 
-
-    
+    @GetMapping("/search")
+    public Slice<TripResponseDTO> searchTrips(
+                                                @RequestParam String origin,
+                                                @RequestParam String destination,
+                                                @RequestParam(required = false) Instant departureAfter,
+                                                @RequestParam(defaultValue = "1") int minSeats,
+                                                @RequestParam(defaultValue = "0") int page,
+                                                @RequestParam(defaultValue = "20") int size  
+                                            ){
+        return tripService.searchTrips(origin, destination, departureAfter, minSeats, page, size);
+    }
 }
