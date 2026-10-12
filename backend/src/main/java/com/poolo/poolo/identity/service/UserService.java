@@ -9,7 +9,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.poolo.poolo.identity.dto.AuthResponseDTO;
 import com.poolo.poolo.identity.dto.ConfirmEmailVerificationRequest;
+import com.poolo.poolo.identity.dto.LoginRequest;
 import com.poolo.poolo.identity.dto.RegisterUserRequest;
 import com.poolo.poolo.identity.dto.RequestEmailVerificationRequest;
 import com.poolo.poolo.identity.dto.UserResponseDTO;
@@ -27,6 +29,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailVerificationTokenRepository tokenRepository;
+    private final JwtService jwtService;
 
     private static final Set<String> FORBIDDEN_DOMAINS  = Set.of("gmail.com","yahoo.com","outlook.com","hotmail.com","icloud.com");
 
@@ -154,10 +157,29 @@ public class UserService {
             user.getRole(),
             user.getCreatedAt()
         );
-
-    
-
     }
 
+        public AuthResponseDTO login(LoginRequest request){
+            User user = userRepository.findByCorporateEmail(request.corporateEmail()).orElseThrow(() -> new IllegalArgumentException("No User Found"));
 
-}
+            if(!passwordEncoder.matches(request.password(), user.getPasswordHash())){
+                throw new IllegalArgumentException("Invalid email or password");
+            }
+
+
+                String accessToken = jwtService.generateAccessToken(user.getId(), request.corporateEmail(), user.getRole());
+                String refreshToken = jwtService.generateRefreshToken(user.getId());
+
+                UserResponseDTO userDTO = new UserResponseDTO(
+                    user.getId(),
+                    user.getName(),
+                    user.getCorporateEmail(),
+                    user.getPhoneNumber(),
+                    user.isCorporateEmailVerified(),
+                    user.getRole(),
+                    user.getCreatedAt()
+                );
+
+                return AuthResponseDTO.of(accessToken, refreshToken, userDTO);
+        }
+    }
