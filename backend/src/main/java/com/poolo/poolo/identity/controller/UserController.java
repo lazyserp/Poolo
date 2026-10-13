@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.poolo.poolo.identity.dto.AuthResponseDTO;
 import com.poolo.poolo.identity.dto.ConfirmEmailVerificationRequest;
+import com.poolo.poolo.identity.dto.LoginRequest;
 import com.poolo.poolo.identity.dto.RegisterUserRequest;
 import com.poolo.poolo.identity.dto.RequestEmailVerificationRequest;
 import com.poolo.poolo.identity.dto.UserResponseDTO;
@@ -41,6 +43,12 @@ public class UserController {
     public ResponseEntity<Map<String,String>> confirmVerification(@Valid @RequestBody ConfirmEmailVerificationRequest request){
         userService.confirmEmailVerification(request);
         return ResponseEntity.ok(Map.of("message","Email is verified successfully"));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequest request){
+       AuthResponseDTO response =  userService.login(request);
+        return ResponseEntity.ok(response);
     }
 
     

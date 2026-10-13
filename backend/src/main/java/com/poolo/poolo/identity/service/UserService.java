@@ -147,7 +147,7 @@ public class UserService {
 
     public UserResponseDTO getUserById(UUID id){
         User user = userRepository.findById(id)
-                                  .orElseThrow(() -> new IllegalArgumentException("User not find"));
+                                  .orElseThrow(() -> new IllegalArgumentException("User not found"));
         return new UserResponseDTO(
             user.getId(),
             user.getName(),
@@ -160,7 +160,7 @@ public class UserService {
     }
 
         public AuthResponseDTO login(LoginRequest request){
-            User user = userRepository.findByCorporateEmail(request.corporateEmail()).orElseThrow(() -> new IllegalArgumentException("No User Found"));
+            User user = userRepository.findByCorporateEmail(request.corporateEmail()).orElseThrow(() -> new IllegalArgumentException("Invalid email or Password"));
 
             if(!passwordEncoder.matches(request.password(), user.getPasswordHash())){
                 throw new IllegalArgumentException("Invalid email or password");
